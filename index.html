@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uruk Healthcare Platform</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar__header">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <span>Uruk</span>
+                </div>
+            </div>
+            <ul class="sidebar__menu">
+                <li><a href="#dashboard" class="sidebar__link active" data-page="dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="#vitals" class="sidebar__link" data-page="vitals"><i class="fas fa-chart-line"></i> Health Vitals</a></li>
+                <li><a href="#records" class="sidebar__link" data-page="records"><i class="fas fa-folder-open"></i> Medical Records</a></li>
+                <li><a href="#consultations" class="sidebar__link" data-page="consultations"><i class="fas fa-user-md"></i> Consultations</a></li>
+                <li><a href="#pharmacy" class="sidebar__link" data-page="pharmacy"><i class="fas fa-pills"></i> Pharmacy</a></li>
+                <li><a href="#emergency" class="sidebar__link" data-page="emergency"><i class="fas fa-exclamation-triangle"></i> Emergency & Alerts</a></li>
+                <li><a href="#ai" class="sidebar__link" data-page="ai"><i class="fas fa-robot"></i> Uruk AI</a></li>
+                <li><a href="#profile" class="sidebar__link" data-page="profile"><i class="fas fa-user"></i> Profile</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Page -->
+            <div id="dashboard" class="page active">
+                <div class="page__header">
+                    <h1>Welcome back, <span id="userName">Rajesh Kumar</span></h1>
+                    <p class="text-secondary">Here's your health overview for today</p>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="card dashboard-card">
+                        <div class="card__body">
+                            <div class="stat">
+                                <div class="stat__icon bg-1"><i class="fas fa-heartbeat"></i></div>
+                                <div class="stat__content">
+                                    <h3>Latest Vitals</h3>
+                                    <p id="latestVitals">HR: 72 bpm | BP: 120/80</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card dashboard-card">
+                        <div class="card__body">
+                            <div class="stat">
+                                <div class="stat__icon bg-2"><i class="fas fa-calendar-check"></i></div>
+                                <div class="stat__content">
+                                    <h3>Next Appointment</h3>
+                                    <p id="nextAppointment">Oct 6, 10:00 AM</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card dashboard-card">
+                        <div class="card__body">
+                            <div class="stat">
+                                <div class="stat__icon bg-3"><i class="fas fa-bell"></i></div>
+                                <div class="stat__content">
+                                    <h3>Active Alerts</h3>
+                                    <p id="activeAlerts">2 notifications</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card dashboard-card">
+                        <div class="card__body">
+                            <div class="stat">
+                                <div class="stat__icon bg-4"><i class="fas fa-id-card"></i></div>
+                                <div class="stat__content">
+                                    <h3>U-Card Status</h3>
+                                    <p id="uCardStatus">Active - URK2024001234</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h2>Quick Actions</h2>
+                    <div class="quick-actions__grid">
+                        <button class="btn btn--primary quick-action-btn" onclick="showReportSymptomModal()">
+                            <i class="fas fa-thermometer-half"></i>
+                            Report Symptom
+                        </button>
+                        <button class="btn btn--secondary quick-action-btn" onclick="showPage('emergency')">
+                            <i class="fas fa-phone"></i>
+                            Emergency Contacts
+                        </button>
+                        <button class="btn btn--secondary quick-action-btn" onclick="showPage('consultations')">
+                            <i class="fas fa-calendar-plus"></i>
+                            Book Appointment
+                        </button>
+                        <button class="btn btn--secondary quick-action-btn" onclick="showPage('pharmacy')">
+                            <i class="fas fa-search"></i>
+                            Medicine Search
+                        </button>
+                    </div>
+                </div>
+
+                <div class="notifications-section">
+                    <h2>Recent Notifications</h2>
+                    <div id="recentNotifications" class="notifications-list"></div>
+                </div>
+            </div>
+
+            <!-- Health Vitals Page -->
+            <div id="vitals" class="page">
+                <div class="page__header">
+                    <h1>Health Vitals</h1>
+                    <button class="btn btn--primary" onclick="showReportSymptomModal()">Report Symptom</button>
+                </div>
+
+                <div class="vitals-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Record Daily Vitals</h2>
+                            <form id="vitalsForm" class="vitals-form">
+                                <div class="form-group">
+                                    <label class="form-label">Heart Rate (bpm)</label>
+                                    <input type="number" class="form-control" id="heartRate" min="40" max="200" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Blood Pressure (mmHg)</label>
+                                    <div class="bp-inputs">
+                                        <input type="number" class="form-control" id="systolic" placeholder="Systolic" min="70" max="200" required>
+                                        <span>/</span>
+                                        <input type="number" class="form-control" id="diastolic" placeholder="Diastolic" min="40" max="120" required>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Temperature (°C)</label>
+                                    <input type="number" class="form-control" id="temperature" step="0.1" min="95" max="110" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Oxygen Saturation (%)</label>
+                                    <input type="number" class="form-control" id="oxygen" min="70" max="100" required>
+                                </div>
+                                <button type="submit" class="btn btn--primary btn--full-width">Save Vitals</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Vitals Trends</h2>
+                            <div class="chart-container" style="position: relative; height: 300px;">
+                                <canvas id="vitalsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Recent Vitals History</h2>
+                        <div id="vitalsHistory" class="vitals-history"></div>
+                        <button class="btn btn--outline" onclick="showVitalsHistory()">View Complete History</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Records Page -->
+            <div id="records" class="page">
+                <div class="page__header">
+                    <h1>Medical Records</h1>
+                    <button class="btn btn--primary" onclick="showUploadModal()">Upload Document</button>
+                </div>
+
+                <div class="records-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h2><i class="fas fa-id-card"></i> U-Card</h2>
+                            <div class="ucard">
+                                <div class="ucard__header">
+                                    <h3>Uruk Digital Health Card</h3>
+                                </div>
+                                <div class="ucard__body">
+                                    <p><strong>Name:</strong> <span id="ucardName">Rajesh Kumar</span></p>
+                                    <p><strong>Card Number:</strong> <span id="ucardNumber">URK2024001234</span></p>
+                                    <p><strong>Blood Type:</strong> <span id="bloodType">O+</span></p>
+                                    <p><strong>Emergency Contact:</strong> <span id="emergencyContact">+91-9876543210</span></p>
+                                </div>
+                                <div class="ucard__qr">
+                                    <div class="qr-placeholder">
+                                        <i class="fas fa-qrcode"></i>
+                                        <p>QR Code</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Search Records</h2>
+                            <div class="search-section">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="recordSearch" placeholder="Search medical records...">
+                                </div>
+                                <div class="filter-buttons">
+                                    <button class="btn btn--outline filter-btn active" data-filter="all">All</button>
+                                    <button class="btn btn--outline filter-btn" data-filter="consultations">Consultations</button>
+                                    <button class="btn btn--outline filter-btn" data-filter="diagnoses">Diagnoses</button>
+                                    <button class="btn btn--outline filter-btn" data-filter="treatments">Treatments</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Recent Medical Records</h2>
+                        <div id="medicalRecordsList" class="records-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultations Page -->
+            <div id="consultations" class="page">
+                <div class="page__header">
+                    <h1>Consultations</h1>
+                    <button class="btn btn--primary" onclick="showBookingModal()">Book New Appointment</button>
+                </div>
+
+                <div class="consultations-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Find Doctors</h2>
+                            <div class="form-group">
+                                <label class="form-label">Search by Specialty</label>
+                                <select class="form-control" id="specialtyFilter">
+                                    <option value="">All Specialties</option>
+                                    <option value="Cardiology">Cardiology</option>
+                                    <option value="General Medicine">General Medicine</option>
+                                    <option value="Dermatology">Dermatology</option>
+                                    <option value="Orthopedics">Orthopedics</option>
+                                </select>
+                            </div>
+                            <button class="btn btn--secondary btn--full-width" onclick="findNearbyDoctors()">
+                                <i class="fas fa-map-marker-alt"></i> Find Nearby Doctors
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Upcoming Appointments</h2>
+                            <div id="upcomingAppointments" class="appointments-list"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Available Doctors</h2>
+                        <div id="doctorsList" class="doctors-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pharmacy Page -->
+            <div id="pharmacy" class="page">
+                <div class="page__header">
+                    <h1>Pharmacy</h1>
+                    <button class="btn btn--primary" onclick="showCart()">
+                        <i class="fas fa-shopping-cart"></i> 
+                        Cart (<span id="cartCount">0</span>)
+                    </button>
+                </div>
+
+                <div class="pharmacy-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Search Medicines</h2>
+                            <div class="form-group">
+                                <input type="text" class="form-control" id="medicineSearch" placeholder="Search medicines...">
+                            </div>
+                            <div id="medicineResults" class="medicines-grid"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>U-Card Benefits</h2>
+                            <div class="benefits-list">
+                                <div class="benefit-item">
+                                    <i class="fas fa-percentage"></i>
+                                    <span>Up to 20% discount at partner pharmacies</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-gift"></i>
+                                    <span>Free home delivery on orders above ₹500</span>
+                                </div>
+                                <div class="benefit-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>Priority service at Uruk partner locations</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Nearby Pharmacies</h2>
+                        <div id="pharmaciesList" class="pharmacies-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency & Alerts Page -->
+            <div id="emergency" class="page">
+                <div class="page__header">
+                    <h1>Emergency & Alerts</h1>
+                    <div class="emergency-toggle">
+                        <label>
+                            <input type="checkbox" id="locationSharing"> Share Location in Emergency
+                        </label>
+                    </div>
+                </div>
+
+                <div class="emergency-grid">
+                    <div class="card emergency-card">
+                        <div class="card__body">
+                            <h2>Emergency Contacts</h2>
+                            <div id="emergencyContactsList" class="emergency-contacts"></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Quick Actions</h2>
+                            <div class="emergency-actions">
+                                <button class="btn btn--primary emergency-btn" onclick="callEmergency()">
+                                    <i class="fas fa-phone"></i>
+                                    Call Emergency
+                                </button>
+                                <button class="btn btn--secondary emergency-btn" onclick="findNearbyTreatment()">
+                                    <i class="fas fa-hospital"></i>
+                                    Find Treatment Center
+                                </button>
+                                <button class="btn btn--outline emergency-btn" onclick="shareLocation()">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Share Location
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Health Alerts</h2>
+                        <div id="healthAlerts" class="alerts-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Uruk AI Page -->
+            <div id="ai" class="page">
+                <div class="page__header">
+                    <h1>Uruk AI Assistant</h1>
+                </div>
+
+                <div class="ai-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h2><i class="fas fa-file-medical"></i> Report Analysis</h2>
+                            <p>Upload your medical reports for AI-powered analysis and insights.</p>
+                            <div class="upload-area" onclick="triggerFileUpload('reportUpload')">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Click to upload medical report</p>
+                                <input type="file" id="reportUpload" accept=".pdf,.jpg,.png,.jpeg" style="display: none;">
+                            </div>
+                            <button class="btn btn--primary btn--full-width" onclick="analyzeReport()">Analyze Report</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2><i class="fas fa-search"></i> Infection Scan</h2>
+                            <p>Scan images for potential infections and get care recommendations.</p>
+                            <div class="upload-area" onclick="triggerFileUpload('infectionUpload')">
+                                <i class="fas fa-camera"></i>
+                                <p>Click to upload image for scanning</p>
+                                <input type="file" id="infectionUpload" accept=".jpg,.png,.jpeg" style="display: none;">
+                            </div>
+                            <button class="btn btn--primary btn--full-width" onclick="scanInfection()">Scan for Infections</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>AI Analysis Results</h2>
+                        <div id="aiResults" class="ai-results">
+                            <p class="text-secondary">Upload a medical report or image to get AI-powered insights.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Health Recommendations</h2>
+                        <div id="aiRecommendations" class="recommendations-list">
+                            <div class="recommendation-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <span>Based on your recent vitals, consider increasing your water intake.</span>
+                            </div>
+                            <div class="recommendation-item">
+                                <i class="fas fa-running"></i>
+                                <span>Your heart rate trends suggest you might benefit from regular cardio exercise.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div id="profile" class="page">
+                <div class="page__header">
+                    <h1>Profile Settings</h1>
+                </div>
+
+                <div class="profile-grid">
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Personal Information</h2>
+                            <form id="profileForm">
+                                <div class="form-group">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="fullName" value="Rajesh Kumar">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Age</label>
+                                    <input type="number" class="form-control" id="age" value="28">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Blood Type</label>
+                                    <select class="form-control" id="bloodTypeSelect">
+                                        <option value="O+">O+</option>
+                                        <option value="O-">O-</option>
+                                        <option value="A+">A+</option>
+                                        <option value="A-">A-</option>
+                                        <option value="B+">B+</option>
+                                        <option value="B-">B-</option>
+                                        <option value="AB+">AB+</option>
+                                        <option value="AB-">AB-</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Emergency Contact</label>
+                                    <input type="tel" class="form-control" id="emergencyPhone" value="+91-9876543210">
+                                </div>
+                                <button type="submit" class="btn btn--primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card__body">
+                            <h2>Preferences</h2>
+                            <div class="preferences">
+                                <div class="preference-item">
+                                    <label>
+                                        <input type="checkbox" id="darkMode"> Enable Dark Mode
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Language</label>
+                                    <select class="form-control" id="language">
+                                        <option value="en">English</option>
+                                        <option value="hi">Hindi</option>
+                                        <option value="ta">Tamil</option>
+                                        <option value="te">Telugu</option>
+                                    </select>
+                                </div>
+                                <div class="preference-item">
+                                    <label>
+                                        <input type="checkbox" id="notifications" checked> Enable Notifications
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card__body">
+                        <h2>Help & Support</h2>
+                        <div class="support-links">
+                            <a href="#" class="support-link">
+                                <i class="fas fa-question-circle"></i>
+                                Frequently Asked Questions
+                            </a>
+                            <a href="#" class="support-link">
+                                <i class="fas fa-headset"></i>
+                                Contact Support
+                            </a>
+                            <a href="#" class="support-link">
+                                <i class="fas fa-shield-alt"></i>
+                                Privacy Policy
+                            </a>
+                            <a href="#" class="support-link">
+                                <i class="fas fa-file-contract"></i>
+                                Terms of Service
+                            </a>
+                        </div>
+                        <button class="btn btn--outline logout-btn" onclick="logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="symptomModal" class="modal hidden">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2>Report Symptom</h2>
+                <button class="modal__close" onclick="closeModal('symptomModal')">&times;</button>
+            </div>
+            <form id="symptomForm">
+                <div class="form-group">
+                    <label class="form-label">Symptom</label>
+                    <input type="text" class="form-control" id="symptom" placeholder="Describe your symptom" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Severity</label>
+                    <select class="form-control" id="severity" required>
+                        <option value="">Select severity</option>
+                        <option value="mild">Mild</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="severe">Severe</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Additional Notes</label>
+                    <textarea class="form-control" id="notes" rows="3" placeholder="Any additional information"></textarea>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full-width">Report Symptom</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="bookingModal" class="modal hidden">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2>Book Appointment</h2>
+                <button class="modal__close" onclick="closeModal('bookingModal')">&times;</button>
+            </div>
+            <form id="bookingForm">
+                <div class="form-group">
+                    <label class="form-label">Department</label>
+                    <select class="form-control" id="department" required>
+                        <option value="">Select department</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="General Medicine">General Medicine</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Doctor</label>
+                    <select class="form-control" id="doctorSelect" required>
+                        <option value="">Select doctor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="appointmentDate" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Time Slot</label>
+                    <select class="form-control" id="timeSlot" required>
+                        <option value="">Select time</option>
+                        <option value="09:00 AM">09:00 AM</option>
+                        <option value="10:00 AM">10:00 AM</option>
+                        <option value="11:00 AM">11:00 AM</option>
+                        <option value="02:00 PM">02:00 PM</option>
+                        <option value="03:00 PM">03:00 PM</option>
+                        <option value="04:00 PM">04:00 PM</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn--primary btn--full-width">Book Appointment</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="cartModal" class="modal hidden">
+        <div class="modal__content">
+            <div class="modal__header">
+                <h2>Shopping Cart</h2>
+                <button class="modal__close" onclick="closeModal('cartModal')">&times;</button>
+            </div>
+            <div id="cartItems" class="cart-items"></div>
+            <div class="cart-total">
+                <h3>Total: ₹<span id="cartTotal">0</span></h3>
+            </div>
+            <button class="btn btn--primary btn--full-width" onclick="checkout()">Proceed to Checkout</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
